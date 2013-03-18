@@ -1,0 +1,10 @@
+CIS 192 Project Proposal
+---------------------------
+
+Noam Zilberstein
+
+For my project, I plan to make a utility that generates sudoku puzzles of various difficulty levels and then outputs a nicely formatted puzzle image as well as a solution.  This involves creating a program that can solve sudoku puzzles using various logical techniques with different difficulty levels associated with them.
+
+The idea is that this program could be used by a newspaper, website, etc that publishes daily sudoku puzzles.  The puzzles will be generated randomly, so each day (or every time you run it) you will get a brand new puzzle.
+
+I will be using the PIL package to create images of the puzzles.
