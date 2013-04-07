@@ -1,0 +1,54 @@
+N = 3;
+M = 3;
+
+def from_array(arr):
+    """Creates a puzzle from a 2D array"""
+    return [[Node(val) for val in l] for l in arr]
+
+def puz_fold(group, process):
+    for node in puz[arr]:
+        for n in node.poss:
+            pass
+
+class Puzzle(object):
+    """Puzzle object stores all nodes.  For fast computations, it keeps 3
+    versions.  That way it can always traverse the array quickly"""
+
+    def __init__(self,arr=None):
+        if arr is None:
+            # Create new Nodes for each cell
+            self._rows = [[Node() for i in range(N * M)]
+                          for j in range(N * M)]
+        else:
+            # Fill Nodes with values from 2D array
+            self._rows = [[Node(arr[j][i]) for i in range(N * M)]
+                          for j in range(N * M)]
+        # Assign each elt in the cols array to the appropriate Node
+        self._cols = [[self._rows[i][j] for i in range(N * M)]
+                      for j in range(N * M)]
+        # Do the same for each box
+        self._boxs = [[self._rows[N*(j/N)+(i/M)][M*(j%N)+(i%M)]
+                       for i in range(N * M)]
+                      for j in range(N * M)]
+
+    def __repr__(self):
+        return '\n'.join([' '.join([str(val) for val in r]) for r in self._rows])
+
+class Node(object):
+    """Node used in a puzzle"""
+
+    def __init__(self,val=None):
+        """Constructor, value of the Node is initialized to None"""
+        self.val = val
+        if self.val is None:
+            self.poss = range(1, PUZZLE_M*PUZZLE_N+1)
+            self.given = False
+        else:
+            self.poss = [];
+            self.given=True
+
+    def __repr__(self):
+        if self.val is None:
+            return " "
+        else:
+            return str(self.val)
