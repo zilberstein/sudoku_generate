@@ -3,6 +3,9 @@ import text
 import copy
 import time
 
+from multiprocessing import Pool
+
+
 PUZZLE = [[None,None,1,9,5,7,None,6,3],
           [None,None,None,8,None,6,None,7,None],
           [7,6,9,1,3,None,8,None,5],
@@ -16,9 +19,9 @@ PUZZLE = [[None,None,1,9,5,7,None,6,3],
 MEDIUM = [[None, None, 7,8]]
 
 def update_groups(node):
-    single_candidate(node.puz.rows()[node.row])
-    single_candidate(node.puz.cols()[node.col])
-    single_candidate(node.puz.boxs()[node.box])
+    single_candidate(node.puz.rows[node.row])
+    single_candidate(node.puz.cols[node.col])
+    single_candidate(node.puz.boxs[node.box])
 
 def single_candidate(group):
     for node in group:
@@ -29,11 +32,11 @@ def single_candidate(group):
 
 def sc_all_groups(puz):
     n = puz.remaining
-    for r in puz.rows():
+    for r in puz.rows:
         single_candidate(r)
-    for c in puz.cols():
+    for c in puz.cols:
         single_candidate(c)
-    for b in puz.boxs():
+    for b in puz.boxs:
         single_candidate(b)
 #    print n,puz.remaining
     if puz.remaining != n and puz.remaining != 0:
@@ -54,12 +57,12 @@ def candidate_lines(group, puz, val):
     boxs = set([node.box for node in group if val in node.poss])
 #    print rows,cols
     if len(rows) == 1:
-        for node in puz.rows()[rows.pop()]:
+        for node in puz.rows[rows.pop()]:
             if node not in group:
                 if node.remove_poss([val]):
                     update_groups(node)
     elif len(cols) == 1:
-        for node in puz.cols()[cols.pop()]:
+        for node in puz.cols[cols.pop()]:
             if node not in group:
                 if node.remove_poss([val]):
                     update_groups(node)
@@ -69,13 +72,13 @@ def solved_group(group):
     return len([node.val for node in group if node.val is not None]) == len(set([node.val for node in group if node.val is not None]))
 
 def solved_puz(puz):
-    for r in puz.rows():
+    for r in puz.rows:
         if not solved_group(r):
             return False
-    for c in puz.cols():
+    for c in puz.cols:
         if not solved_group(c):
             return False
-    for b in puz.boxs():
+    for b in puz.boxs:
         if not solved_group(b):
             return False
     return len(puz.unsolved) == 0
@@ -83,10 +86,9 @@ def solved_puz(puz):
 
 
 def solve(puz):
-    n = puz.remaining
-#    print 'begin SC'
+    puz = copy.deepcopy(puz) # copy puz so as not to modify the original
+    n = len(puz.unsolved)
     sc_all_groups(puz)
-#    print 'end SC',n,puz.remaining
     while n != puz.remaining and puz.remaining != 0:
         for r in puz.rows():
             single_position(r)
@@ -98,28 +100,32 @@ def solve(puz):
     if len(puz.unsolved) == 0:
         return puz
     else:
-        puz = brute_force(puz)
-        return puz
+        return recursive_backtrack(puz)
 
-def brute_force(puz):
+def recursive_backtrack(puz):
     if len(puz.unsolved) == 0:
         return puz
+    # sort the unsolved nodes by number of possibilities so as to have a higher
+    # probability of guessing correctly
     remaining = sorted(puz.unsolved,key = lambda n: len(n.poss))
     node = remaining[0]
     update_groups(node)
-#    text.draw_puz(node.puz)
-    for v in node.poss:
+    r, c = node.row, node.col
+    pool = Pool(processes = len(node.poss))
+    def guess(puz, r, c, v):
         p = copy.deepcopy(puz)
-        p._rows[node.row][node.col].val = v
-        p._rows[node.row][node.col].poss = []
-        p.unsolved.remove(p._rows[node.row][node.col])
-        p.remaining -= 1
-        update_groups(p._rows[node.row][node.col])
-        p = brute_force(p)
+        p.set_node(r,c,v)
+        update_groups(p._rows[r][c])
+        p = recursive_backtrack(p)
         if solved_puz(p):
             return p
-    return puz
-
+    results = [r for r in pool.map(guess, node.poss) in r is not None]
+    if len(results) == 0:
+        return puz
+    elif len(results) == 1:
+        return results[0]
+    else:
+        raise ValueError('Multiple Solutions')
 
 def time_it(f, args):
     start = time.clock()
