@@ -8,7 +8,7 @@ RED = {'bg':(256,178,178),'fg':(256,215,215),'text':(150,0,0),'line':(0,0,0)}
 BRICK = {'bg':(128,25,25),'fg':(100,0,0),'text':(256,200,200),'line':(256,256,256)}
 GHOST = {'bg':(64,0,64),'fg':(32,0,64),'text':(256,128,256),'line':(256,256,256)}
 
-def draw_puz(puz, theme=PURPLE):
+def draw_puz(puz, theme=PURPLE, debug=False):
     w = 1024
     h = 1024
     img = Image.new("RGB", (w,h), theme['bg'])
@@ -26,17 +26,18 @@ def draw_puz(puz, theme=PURPLE):
         else:
             draw.line([(i*w)/9,0,(i*w)/9,h],fill = theme['text'], width=1)
             draw.line([0,(i*h)/9,w,(i*h)/9],fill = theme['text'], width=1)
+    # in debug mode, draw possible values in cells
     for i in range(9):
         for j in range(9):
             val = puz._rows[j][i].val
-            if val is None:
+            if val is None and debug:
                 color = theme['text']
                 for v in puz._rows[j][i].poss:
                     size = draw.textsize(str(v), font=font)
                     ofsx = w*((v-1)%3)/27 + (w/9 - size[0])/6
                     ofsy = h*((v-1)/3)/27 + (h/9 - size[1])/6
                     draw.text((ofsx+(i*w)/9, ofsy+(j*h)/9), str(v), font=font_small, fill=color)
-            else:
+            elif val is not None:
                 if puz._rows[j][i].given:
                     color = theme['line']
                 else:

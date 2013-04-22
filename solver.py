@@ -3,7 +3,7 @@ import text
 import copy
 import time
 
-from multiprocessing import Pool
+from threading import Thread
 
 
 PUZZLE = [[None,None,1,9,5,7,None,6,3],
@@ -111,21 +111,16 @@ def recursive_backtrack(puz):
     node = remaining[0]
     update_groups(node)
     r, c = node.row, node.col
-    pool = Pool(processes = len(node.poss))
-    def guess(puz, r, c, v):
+    for v in node.poss:
         p = copy.deepcopy(puz)
-        p.set_node(r,c,v)
-        update_groups(p._rows[r][c])
+        p._rows[node.row][node.col].val = v
+        p._rows[node.row][node.col].poss = []
+        p.unsolved.remove(p._rows[node.row][node.col])
+        update_groups(p._rows[node.row][node.col])
         p = recursive_backtrack(p)
         if solved_puz(p):
             return p
-    results = [r for r in pool.map(guess, node.poss) in r is not None]
-    if len(results) == 0:
-        return puz
-    elif len(results) == 1:
-        return results[0]
-    else:
-        raise ValueError('Multiple Solutions')
+    return puz
 
 def time_it(f, args):
     start = time.clock()
