@@ -1,5 +1,3 @@
-import text
-
 N = 3;
 M = 3;
 
@@ -105,3 +103,12 @@ class puzIterator:
     def __getitem__(self, group):
         return [self.puz._rows[self.tg(group,index)][self.ti(group,index)]
                 for index in range(N * M)]
+
+def from_file(filename):
+    f = open(filename, 'r')
+    puzarray = [[int(elt) if elt != ' ' else None for elt in row][::2] for row in f.read().split('\n')]
+    f.close()
+    try:
+        return Puzzle(puzarray)
+    except IndexError:
+        return None
