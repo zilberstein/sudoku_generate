@@ -43,23 +43,6 @@ def single_position(group):
                 if p not in [x for n in group for x in n.poss if n is not node]:
                     node.remove_poss([v for v in node.poss if v is not p])
                     update_groups(node)
-#
-#
-#def candidate_lines(group, puz, val):
-#    rows = set([node.row for node in group if val in node.poss])
-#    cols = set([node.col for node in group if val in node.poss])
-#    boxs = set([node.box for node in group if val in node.poss])
-##    print rows,cols
-#    if len(rows) == 1:
-#        for node in puz.rows[rows.pop()]:
-#            if node not in group:
-#                if node.remove_poss([val]):
-#                    update_groups(node)
-#    elif len(cols) == 1:
-#        for node in puz.cols[cols.pop()]:
-#            if node not in group:
-#                if node.remove_poss([val]):
-#                    update_groups(node)
 
 
 def solved_group(group):
@@ -81,7 +64,6 @@ def solved_puz(puz):
             return False
     # And no nodes are unsolved
     return len(puz.unsolved) == 0
-
 
 
 def solve(puz):
@@ -131,3 +113,6 @@ def recursive_backtrack(puz):
         if solved_puz(p):
             return p
     return puz
+
+def p(d):
+    print d

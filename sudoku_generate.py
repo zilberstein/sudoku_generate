@@ -3,8 +3,10 @@ import puzzle
 import scraper
 import draw
 import time
+import sys
 
 THEMES = [draw.PURPLE, draw.YELLOW, draw.ORANGE, draw.BLUE, draw.RED, draw.BRICK, draw.GHOST]
+
 
 def scrape():
     print 'Please choose a difficulty:'
@@ -14,7 +16,8 @@ def scrape():
     print ' (4) Extra Hard'
     level = int(raw_input('level: '))
     if level not in range(1,5):
-        print 'invalid input, please try again'
+        print 'ERROR: invalid input'
+        return None
     print 'Preparing to scrape puzzle from websudoku.com...'
     return scraper.get_puzzle(level)
 
@@ -23,7 +26,7 @@ def from_file():
     return puzzle.from_file(filename)
 
 def main():
-    print 'Welome to Sudoku Generate v1.0'
+    print '\n\n\nWelome to Sudoku Generate v1.0'
     print '------------------------------'
     print 'Would you like to:'
     print ' (1) Load puzzle from a file'
@@ -33,8 +36,12 @@ def main():
         raw_puzzle = from_file()
     elif choice == '2':
         raw_puzzle = scrape()
+    else:
+        print 'ERROR: invalid input'
+        sys.exit()
     if raw_puzzle is None:
-        raise exception
+        print 'No puzzle'
+        sys.exit()
     print 'load successful, here is your puzzle:'
     print raw_puzzle
     name = raw_input('Please enter a puzzle name: ')
@@ -43,6 +50,7 @@ def main():
     dt = (time.clock() - start) * 1000
     if not solver.solved_puz(solved_puzzle):
         print 'Unable to solve puzzle %(name)s' % {'name':name}
+        sys.exit()
     print 'Successfully solved %(name)s in %(time)fms' % {'name':name,'time':dt}
     print 'Please specify a theme:'
     print ' (1) Purple'
@@ -53,6 +61,9 @@ def main():
     print ' (6) Brick'
     print ' (7) Ghost'
     theme = int(raw_input('theme: '))
+    if theme not in range(1,8):
+        print 'ERROR: invalid input'
+        sys.exit()
     draw.draw_puz(raw_puzzle,THEMES[theme - 1]).save('puzzles/%(name)s_original.bmp'%{'name':name})
     draw.draw_puz(solved_puzzle,THEMES[theme - 1]).save('puzzles/%(name)s_solved.bmp'%{'name':name})
     text_puz = open('puzzles/%(name)s.puz'%{'name':name}, 'w')

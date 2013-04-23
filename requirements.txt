@@ -1,0 +1,9 @@
+REQUIREMENTS
+------------
+
+In order for image generation to work, you need to have PIL installed with True Type.
+
+PIL can be downloaded here:
+http://www.pythonware.com/products/pil/
+
+To use TTF fonts use freetype, I believe this is preinstalled on Mac OS X

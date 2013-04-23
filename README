@@ -1,0 +1,30 @@
+SUDOKU GENERATE v1.0
+--------------------
+
+The purpose of this utility is to generate sudoku puzzles and thier solutions.  Every time it is run, it prompts for user input to either open a well formatted puzzle file or scrape one from websudoku.com.  If the puzzle is valid, then 4 files are created.  The first two files are text files containing the puzzle and its solution with file extensions .puz and .spz respectively.  The second two files are nicely formatted bitmaps of the puzzle which can be printed, displayed on a website, etc.  In order to use this utility, run 'sudoku_generate.py'
+
+Sudoku Generate makes use of a few modules:
+
+(1) puzzle.py
+--------------------
+This module contains the definition of the puzzle object and iterators to iterate over the different groups in a puzzle.  A group is either a row, a column, or a 3x3 box.  puzzle.py defines custom iterators to easily iterate over any group
+
+(2) scraper.py
+--------------------
+This module contains a single function, 'get_puzzle()', that scrapes a puzzle off of websudoku.com.  It then returns a puzzle object.
+
+(3) solver.py
+--------------------
+This module solves puzzle objects.  The solve() function takes in a puzzle object and returns a solved puzzle object.  It also has various other functions that solver also calls as helpers.
+
+My solver uses simple logic to solve easy puzzles.  For harder puzzles it uses recursive backtracking.  This gets fairly good performance, it can solve any puzzle in a fraction of a second.
+
+(4) draw.py
+--------------------
+This module draws contains a function that takes in a puzzle and return PIL Images.
+
+
+NOTE on multithreading
+--------------------
+I determined that multithreading was not actually a good idea for this project.  Deploying processes is an intensive process that does not seem to work well with recursion, an integral part of the solving process.  To demonstate this, I made the program multithread_solve.py which times a recursive process done sequentially and with multiple processes.  No matter what I tried, the sequentially exectued one was faster.  I also read this stack overflow post that confirmed this:
+http://stackoverflow.com/questions/167018/should-i-use-threading-and-recursion-together
